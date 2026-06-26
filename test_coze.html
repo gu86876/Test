@@ -1,0 +1,26 @@
+<html>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 1. 加载 Coze Web SDK 核心库
+    const externalScript = document.createElement('script');
+    externalScript.src = 'https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.0.0-beta.2/libs/cn/index.js';
+    externalScript.type = 'text/javascript';
+    
+    externalScript.onload = function() {
+      // 2. SDK 加载完成后，初始化聊天客户端
+      new CozeWebSDK.WebChatClient({
+        config: {
+          bot_id: '7630279789462470665', // 替换为你的 Bot ID
+        },
+        componentProps: {
+          title: '我的AI助手', // 可选，聊天窗口标题
+        },
+        auth: {
+          token: 'cztei_lTvDNifJQlIX72z1gwgoR1V2NCzlB2moHFbyf5rd1xVZQNp7f9g6p9MKRHVpMg4rm' // 替换为你的 API Key
+        }
+      });
+    };
+    document.body.appendChild(externalScript);
+  });
+</script>
+</html>
