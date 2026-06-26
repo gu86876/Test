@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}角色管理{% endblock %}
+{% block content %}
+<div class="page-header"><h1><i class="bi bi-shield-check"></i> 角色管理</h1>
+<a href="{% url 'accounts:role_create' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> 添加角色</a></div>
+<div class="card"><div class="card-body" style="padding:0">
+<table class="table">
+<thead><tr><th>名称</th><th>代码</th><th>描述</th><th>创建时间</th><th>操作</th></tr></thead>
+<tbody>
+{% for r in roles %}
+<tr><td><strong>{{ r.name }}</strong></td><td>{{ r.code }}</td><td>{{ r.description|truncatechars:50 }}</td>
+<td>{{ r.created_at|date:"Y-m-d" }}</td>
+<td><a href="{% url 'accounts:role_edit' r.pk %}" class="btn btn-outline btn-xs">编辑</a></td></tr>
+{% empty %}
+<tr><td colspan="5" style="text-align:center;color:var(--text-light);padding:30px">暂无角色</td></tr>
+{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

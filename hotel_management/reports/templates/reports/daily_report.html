@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}经营日报{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-graph-up"></i> 经营日报</h1>
+    <div style="display:flex;gap:8px">
+        <a href="?offset={{ offset|add:'-1' }}" class="btn btn-outline btn-sm"><i class="bi bi-chevron-left"></i></a>
+        <span style="padding:8px 12px;font-weight:600">{{ report_date|date:"Y年m月d日" }}</span>
+        <a href="?offset={{ offset|add:'1' }}" class="btn btn-outline btn-sm"><i class="bi bi-chevron-right"></i></a>
+        <a href="?offset=0" class="btn btn-outline btn-sm">今天</a>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card green"><div class="stat-icon"><i class="bi bi-cash-stack"></i></div><div class="stat-value">¥{{ revenue|floatformat:0 }}</div><div class="stat-label">总营收</div></div>
+    <div class="stat-card blue"><div class="stat-icon"><i class="bi bi-house"></i></div><div class="stat-value">¥{{ room_revenue|floatformat:0 }}</div><div class="stat-label">房费收入</div></div>
+    <div class="stat-card orange"><div class="stat-icon"><i class="bi bi-cup"></i></div><div class="stat-value">¥{{ extra_revenue|floatformat:0 }}</div><div class="stat-label">其他消费</div></div>
+    <div class="stat-card purple"><div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div><div class="stat-value">{{ occupancy_rate }}%</div><div class="stat-label">出租率 ({{ occupied_count }}/{{ total_rooms }})</div></div>
+    <div class="stat-card red"><div class="stat-icon"><i class="bi bi-door-open"></i></div><div class="stat-value">{{ checkins }}</div><div class="stat-label">入住数</div></div>
+    <div class="stat-card blue"><div class="stat-icon"><i class="bi bi-calendar-plus"></i></div><div class="stat-value">{{ new_bookings }}</div><div class="stat-label">新增订单</div></div>
+</div>
+
+<div class="grid-2">
+<div class="card"><div class="card-header">退房明细 ({{ total_checkouts }}笔)</div><div class="card-body" style="padding:0">
+<table class="table">
+<thead><tr><th>时间</th><th>订单号</th><th>房费</th><th>其他</th><th>实收</th><th>方式</th></tr></thead>
+<tbody>
+{% for co in checkouts %}
+<tr><td>{{ co.check_out_time|date:"H:i" }}</td>
+<td>{{ co.booking.order_no }}</td>
+<td>¥{{ co.room_charge }}</td>
+<td>¥{{ co.extra_charges }}</td>
+<td><strong>¥{{ co.final_amount }}</strong></td>
+<td>{{ co.get_payment_method_display }}</td></tr>
+{% empty %}
+<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:20px">暂无退房记录</td></tr>
+{% endfor %}
+</tbody></table></div></div>
+
+<div class="card"><div class="card-header">渠道分析</div><div class="card-body">
+{% if channel_data %}
+<table class="table">
+<thead><tr><th>渠道</th><th>订单数</th><th>金额合计</th></tr></thead>
+<tbody>
+{% for c in channel_data %}
+<tr><td>{{ c.channel }}</td><td>{{ c.count }}</td><td>¥{{ c.total|default:0 }}</td></tr>
+{% endfor %}
+</tbody></table>
+{% else %}<p style="text-align:center;color:var(--text-light);padding:20px">暂无数据</p>{% endif %}
+</div></div>
+</div>
+{% endblock %}

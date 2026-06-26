@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}会员等级{% endblock %}
+{% block content %}
+<div class="page-header"><h1><i class="bi bi-award"></i> 会员等级</h1>
+<a href="{% url 'customers:membership_create' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> 添加等级</a></div>
+<div class="card"><div class="card-body" style="padding:0">
+<table class="table">
+<thead><tr><th>名称</th><th>代码</th><th>折扣</th><th>积分倍率</th><th>延迟退房</th><th>最低消费</th><th>操作</th></tr></thead>
+<tbody>
+{% for l in levels %}
+<tr><td><strong>{{ l.name }}</strong></td><td>{{ l.code }}</td><td>{{ l.discount }}折</td>
+<td>{{ l.points_rate }}x</td><td>{{ l.late_checkout_hours }}小时</td>
+<td>¥{{ l.min_spending }}</td>
+<td><a href="{% url 'customers:membership_edit' l.pk %}" class="btn btn-outline btn-xs">编辑</a></td></tr>
+{% empty %}
+<tr><td colspan="7" style="text-align:center;color:var(--text-light);padding:30px">暂无会员等级</td></tr>
+{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

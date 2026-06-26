@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}客户管理{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-people"></i> 客户管理</h1>
+    <a href="{% url 'customers:customer_create' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> 添加客户</a>
+</div>
+<form class="filter-bar" method="get">
+    <input type="text" name="q" class="form-control" placeholder="搜索姓名/手机号/身份证..." value="{{ q }}" style="max-width:300px">
+    <button type="submit" class="btn btn-primary btn-sm">搜索</button>
+</form>
+<div class="card"><div class="card-body" style="padding:0">
+<table class="table">
+<thead><tr><th>姓名</th><th>性别</th><th>手机号</th><th>身份证</th><th>会员</th><th>积分</th><th>入住次数</th><th>累计消费</th><th>状态</th><th>操作</th></tr></thead>
+<tbody>
+{% for c in customers %}
+<tr>
+    <td><strong>{{ c.name }}</strong></td><td>{{ c.get_gender_display }}</td>
+    <td>{{ c.phone }}</td><td>{{ c.id_card|default:"-" }}</td>
+    <td>{{ c.membership.name|default:"普通" }}</td><td>{{ c.points }}</td>
+    <td>{{ c.total_stays }}</td><td>¥{{ c.total_spending }}</td>
+    <td>{% if c.is_blacklisted %}<span class="badge badge-danger">黑名单</span>{% else %}<span class="badge badge-success">正常</span>{% endif %}</td>
+    <td>
+        <a href="{% url 'customers:customer_detail' c.pk %}" class="btn btn-outline btn-xs">详情</a>
+        <a href="{% url 'customers:customer_edit' c.pk %}" class="btn btn-outline btn-xs">编辑</a>
+        <a href="{% url 'customers:customer_blacklist' c.pk %}" class="btn btn-{% if c.is_blacklisted %}success{% else %}danger{% endif %} btn-xs">{% if c.is_blacklisted %}解除{% else %}拉黑{% endif %}</a>
+    </td>
+</tr>
+{% empty %}
+<tr><td colspan="10" style="text-align:center;color:var(--text-light);padding:30px">暂无客户</td></tr>
+{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}操作日志{% endblock %}
+{% block content %}
+<div class="page-header"><h1><i class="bi bi-journal-text"></i> 操作日志</h1></div>
+<div class="filter-bar">
+    <a href="?" class="btn btn-outline btn-sm {% if not action_filter %}active{% endif %}" style="{% if not action_filter %}background:var(--primary);color:#fff{% endif %}">全部</a>
+    {% for a in actions %}
+    <a href="?action={{ a }}" class="btn btn-outline btn-sm {% if action_filter == a %}active{% endif %}" style="{% if action_filter == a %}background:var(--primary);color:#fff{% endif %}">{{ a }}</a>
+    {% endfor %}
+</div>
+<div class="card"><div class="card-body" style="padding:0">
+<table class="table">
+<thead><tr><th>时间</th><th>操作人</th><th>操作类型</th><th>内容</th><th>IP</th></tr></thead>
+<tbody>
+{% for log in logs %}
+<tr><td>{{ log.created_at|date:"Y-m-d H:i:s" }}</td><td>{{ log.user.username|default:"系统" }}</td>
+<td><span class="badge badge-info">{{ log.action }}</span></td><td>{{ log.content }}</td><td>{{ log.ip_address }}</td></tr>
+{% empty %}
+<tr><td colspan="5" style="text-align:center;color:var(--text-light);padding:30px">暂无日志</td></tr>
+{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

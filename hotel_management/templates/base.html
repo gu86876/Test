@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}酒店管理系统{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-building"></i>
+            <span>酒店管理系统</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="bi bi-speedometer2"></i> <span>工作台</span>
+            </a>
+
+            <div class="sidebar-section">客房管理</div>
+            <a href="{% url 'rooms:room_grid' %}" class="sidebar-item {% if 'rooms' in request.path and 'types' not in request.path %}active{% endif %}">
+                <i class="bi bi-grid-3x3-gap-fill"></i> <span>房态图</span>
+            </a>
+            <a href="{% url 'rooms:room_list' %}" class="sidebar-item">
+                <i class="bi bi-list-ul"></i> <span>房间列表</span>
+            </a>
+            <a href="{% url 'rooms:room_type_list' %}" class="sidebar-item {% if 'types' in request.path %}active{% endif %}">
+                <i class="bi bi-tags"></i> <span>房型管理</span>
+            </a>
+
+            <div class="sidebar-section">前台接待</div>
+            <a href="{% url 'bookings:booking_list' %}" class="sidebar-item {% if 'bookings' in request.path and 'check' not in request.path %}active{% endif %}">
+                <i class="bi bi-calendar-check"></i> <span>订单管理</span>
+            </a>
+            <a href="{% url 'bookings:check_in' %}" class="sidebar-item">
+                <i class="bi bi-door-open"></i> <span>办理入住</span>
+            </a>
+            <a href="{% url 'bookings:check_out' %}" class="sidebar-item">
+                <i class="bi bi-door-closed"></i> <span>办理退房</span>
+            </a>
+            <a href="{% url 'bookings:room_change' %}" class="sidebar-item">
+                <i class="bi bi-arrow-left-right"></i> <span>换房处理</span>
+            </a>
+
+            <div class="sidebar-section">客户管理</div>
+            <a href="{% url 'customers:customer_list' %}" class="sidebar-item {% if 'customers' in request.path and 'membership' not in request.path %}active{% endif %}">
+                <i class="bi bi-people"></i> <span>客户档案</span>
+            </a>
+            <a href="{% url 'customers:membership_list' %}" class="sidebar-item">
+                <i class="bi bi-award"></i> <span>会员等级</span>
+            </a>
+
+            <div class="sidebar-section">统计报表</div>
+            <a href="{% url 'reports:daily_report' %}" class="sidebar-item">
+                <i class="bi bi-graph-up"></i> <span>经营日报</span>
+            </a>
+            <a href="{% url 'reports:monthly_report' %}" class="sidebar-item">
+                <i class="bi bi-bar-chart"></i> <span>经营月报</span>
+            </a>
+            <a href="{% url 'reports:revenue_analysis' %}" class="sidebar-item">
+                <i class="bi bi-pie-chart"></i> <span>收益分析</span>
+            </a>
+
+            <div class="sidebar-section">系统设置</div>
+            <a href="{% url 'system:dict_list' %}" class="sidebar-item">
+                <i class="bi bi-gear"></i> <span>数据字典</span>
+            </a>
+            <a href="{% url 'system:operation_logs' %}" class="sidebar-item">
+                <i class="bi bi-journal-text"></i> <span>操作日志</span>
+            </a>
+            <a href="{% url 'system:hotel_config' %}" class="sidebar-item">
+                <i class="bi bi-sliders"></i> <span>系统配置</span>
+            </a>
+            <a href="{% url 'accounts:user_list' %}" class="sidebar-item">
+                <i class="bi bi-person-badge"></i> <span>员工管理</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div style="margin-bottom:4px;"><i class="bi bi-person-circle"></i> {{ user.username }}</div>
+            <a href="{% url 'accounts:logout' %}"><i class="bi bi-box-arrow-right"></i> 退出登录</a>
+        </div>
+    </aside>
+    {% endif %}
+
+    <main class="main-content">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if not user.is_authenticated %}
+    <style>
+        .main-content { margin-left: 0 !important; }
+    </style>
+    {% endif %}
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

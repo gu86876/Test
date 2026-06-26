@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}员工管理{% endblock %}
+{% block content %}
+<div class="page-header"><h1><i class="bi bi-person-badge"></i> 员工管理</h1>
+<a href="{% url 'accounts:user_create' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> 添加员工</a></div>
+<div class="card"><div class="card-body" style="padding:0">
+<table class="table">
+<thead><tr><th>用户名</th><th>邮箱</th><th>角色</th><th>手机号</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead>
+<tbody>
+{% for u in users %}
+<tr><td><strong>{{ u.username }}</strong></td><td>{{ u.email|default:"-" }}</td>
+<td>{{ u.profile.role.name|default:"未分配" }}</td><td>{{ u.profile.phone|default:"-" }}</td>
+<td>{% if u.is_active %}<span class="badge badge-success">在职</span>{% else %}<span class="badge badge-gray">离职</span>{% endif %}</td>
+<td>{{ u.date_joined|date:"Y-m-d" }}</td>
+<td>
+    <a href="{% url 'accounts:user_edit' u.pk %}" class="btn btn-outline btn-xs">编辑</a>
+    <a href="{% url 'accounts:user_delete' u.pk %}" class="btn btn-danger btn-xs" onclick="return confirm('确认删除?')">删除</a>
+</td></tr>
+{% empty %}
+<tr><td colspan="7" style="text-align:center;color:var(--text-light);padding:30px">暂无员工</td></tr>
+{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

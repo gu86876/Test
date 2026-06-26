@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}房态图{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-grid-3x3-gap-fill"></i> 房态图</h1>
+    <div>
+        <a href="{% url 'rooms:room_create' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> 添加房间</a>
+        <a href="{% url 'rooms:room_list' %}" class="btn btn-outline"><i class="bi bi-list-ul"></i> 列表视图</a>
+    </div>
+</div>
+
+<!-- Legend -->
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+    {% for s in status_choices %}
+    <div style="display:flex;align-items:center;gap:6px;cursor:pointer" onclick="location.href='?status={{ s.0 }}'">
+        <div style="width:16px;height:16px;border-radius:4px;{% if s.0 == 'available' %}background:#6ee7b7{% elif s.0 == 'occupied' %}background:#93c5fd{% elif s.0 == 'reserved' %}background:#fcd34d{% elif s.0 == 'dirty' %}background:#f9a8d4{% else %}background:#d1d5db{% endif %}"></div>
+        <span style="font-size:13px">{{ s.1 }}</span>
+    </div>
+    {% endfor %}
+    {% if status_filter %}<a href="?" class="btn btn-outline btn-xs">清除筛选</a>{% endif %}
+</div>
+
+<!-- Filters -->
+<div class="filter-bar">
+    <span style="font-size:13px;color:var(--text-light);padding:6px">筛选:</span>
+    <a href="?" class="btn btn-outline btn-sm {% if not status_filter and not floor_filter and not type_filter %}active{% endif %}" style="{% if not status_filter and not floor_filter and not type_filter %}background:var(--primary);color:#fff{% endif %}">全部</a>
+    {% for f in floors %}
+    <a href="?floor={{ f }}" class="btn btn-outline btn-sm {% if floor_filter == f|stringformat:'s' %}active{% endif %}" style="{% if floor_filter == f|stringformat:'s' %}background:var(--primary);color:#fff{% endif %}">{{ f }}楼</a>
+    {% endfor %}
+</div>
+
+<div class="room-grid">
+    {% for room in rooms %}
+    <div class="room-card {{ room.status }}" onclick="window.location='{% url 'rooms:room_detail' room.pk %}'">
+        <div class="room-number">{{ room.room_number }}</div>
+        <div class="room-type">{{ room.room_type.name }}</div>
+        <div class="room-price">¥{{ room.current_price }}</div>
+        <div style="margin-top:6px;">
+            <span class="badge badge-{% if room.status == 'available' %}success{% elif room.status == 'occupied' %}info{% elif room.status == 'reserved' %}warning{% elif room.status == 'dirty' %}danger{% else %}gray{% endif %}">{{ room.get_status_display }}</span>
+        </div>
+    </div>
+    {% empty %}
+    <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-light)">
+        <i class="bi bi-inbox" style="font-size:48px;display:block;margin-bottom:12px"></i>
+        暂无房间数据，请先添加房间
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

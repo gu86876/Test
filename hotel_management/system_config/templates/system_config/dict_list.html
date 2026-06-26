@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}数据字典{% endblock %}
+{% block content %}
+<div class="page-header"><h1><i class="bi bi-gear"></i> 数据字典</h1></div>
+<div class="filter-bar">
+    <a href="?" class="btn btn-outline btn-sm {% if not category %}active{% endif %}" style="{% if not category %}background:var(--primary);color:#fff{% endif %}">全部</a>
+    {% for c in categories %}
+    <a href="?category={{ c.0 }}" class="btn btn-outline btn-sm {% if category == c.0 %}active{% endif %}" style="{% if category == c.0 %}background:var(--primary);color:#fff{% endif %}">{{ c.1 }}</a>
+    {% endfor %}
+</div>
+<div class="card"><div class="card-header">字典列表 <button class="btn btn-primary btn-sm" onclick="document.getElementById('addModal').style.display='flex'"><i class="bi bi-plus"></i> 添加</button></div>
+<div class="card-body" style="padding:0">
+<table class="table">
+<thead><tr><th>类别</th><th>键</th><th>值</th><th>排序</th><th>状态</th><th>操作</th></tr></thead>
+<tbody>
+{% for d in dicts %}
+<tr><td>{{ d.get_category_display }}</td><td>{{ d.key }}</td><td>{{ d.value }}</td><td>{{ d.sort_order }}</td>
+<td>{% if d.is_active %}<span class="badge badge-success">启用</span>{% else %}<span class="badge badge-gray">禁用</span>{% endif %}</td>
+<td><a href="{% url 'system:dict_delete' d.pk %}" class="btn btn-danger btn-xs" onclick="return confirm('确认删除?')">删除</a></td></tr>
+{% empty %}
+<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:30px">暂无字典数据</td></tr>
+{% endfor %}
+</tbody></table></div></div>
+
+<div id="addModal" class="modal-overlay" style="display:none">
+<div class="modal-content">
+<h3>添加字典项</h3>
+<form method="post" action="{% url 'system:dict_create' %}">{% csrf_token %}
+<div class="form-group"><label class="form-label">类别</label><select name="category" class="form-control">
+{% for c in categories %}<option value="{{ c.0 }}">{{ c.1 }}</option>{% endfor %}
+</select></div>
+<div class="form-group"><label class="form-label">键</label><input name="key" class="form-control" required></div>
+<div class="form-group"><label class="form-label">值</label><input name="value" class="form-control" required></div>
+<div class="form-group"><label class="form-label">排序</label><input name="sort_order" class="form-control" type="number" value="0"></div>
+<div class="form-group"><label class="form-label">描述</label><textarea name="description" class="form-control" rows="2"></textarea></div>
+<div style="display:flex;gap:12px"><button type="submit" class="btn btn-primary">保存</button><button type="button" class="btn btn-outline" onclick="document.getElementById('addModal').style.display='none'">取消</button></div>
+</form></div></div>
+{% endblock %}

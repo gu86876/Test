@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }}订单{% endblock %}
+{% block content %}
+<div class="page-header"><h1>{{ action }}订单</h1></div>
+<div class="card"><div class="card-body">
+<form method="post">{% csrf_token %}
+<div class="form-row">
+{% for field in form %}
+<div class="form-group"><label class="form-label">{{ field.label }}</label>{{ field }}</div>
+{% endfor %}
+</div>
+<div style="margin-top:20px">
+    <button type="submit" class="btn btn-primary">保存</button>
+    <a href="{% url 'bookings:booking_list' %}" class="btn btn-outline">取消</a>
+</div>
+</form></div></div>
+{% endblock %}

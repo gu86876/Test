@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}经营月报{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-bar-chart"></i> 经营月报</h1>
+    <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" id="yearInput" class="form-control" value="{{ year }}" style="width:80px" min="2020">
+        <span>年</span>
+        <input type="number" id="monthInput" class="form-control" value="{{ month }}" style="width:60px" min="1" max="12">
+        <span>月</span>
+        <button class="btn btn-primary btn-sm" onclick="location.href='?year='+document.getElementById('yearInput').value+'&month='+document.getElementById('monthInput').value">查询</button>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card green"><div class="stat-value">¥{{ revenue|floatformat:0 }}</div><div class="stat-label">月总营收</div></div>
+    <div class="stat-card blue"><div class="stat-value">¥{{ adr }}</div><div class="stat-label">ADR (平均房价)</div></div>
+    <div class="stat-card orange"><div class="stat-value">{{ avg_occupancy }}%</div><div class="stat-label">月均出租率</div></div>
+    <div class="stat-card purple"><div class="stat-value">¥{{ revpar }}</div><div class="stat-label">RevPAR (单间收益)</div></div>
+    <div class="stat-card red"><div class="stat-value">{{ total_checkouts }}</div><div class="stat-label">退房总数</div></div>
+    <div class="stat-card blue"><div class="stat-value">{{ new_customers }}</div><div class="stat-label">新增客户</div></div>
+</div>
+
+<div class="grid-2">
+<div class="card"><div class="card-header">收入构成</div><div class="card-body">
+<div class="form-row">
+<div><label class="form-label">房费收入</label><p><strong>¥{{ room_revenue|floatformat:0 }}</strong></p></div>
+<div><label class="form-label">其他消费</label><p>¥{{ extra_revenue|floatformat:0 }}</p></div>
+</div></div></div>
+
+<div class="card"><div class="card-header">渠道分析</div><div class="card-body">
+{% if channel_data %}
+<table class="table">
+<thead><tr><th>渠道</th><th>订单数</th><th>金额合计</th></tr></thead>
+<tbody>
+{% for c in channel_data %}
+<tr><td>{{ c.channel }}</td><td>{{ c.count }}</td><td>¥{{ c.total|default:0 }}</td></tr>
+{% endfor %}
+</tbody></table>
+{% else %}<p style="color:var(--text-light)">暂无数据</p>{% endif %}
+</div></div>
+</div>
+{% endblock %}

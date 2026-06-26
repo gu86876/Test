@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block title %}工作台 - 酒店管理系统{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-speedometer2"></i> 工作台</h1>
+    <span style="color:var(--text-light)">{{ today|date:"Y年m月d日" }}</span>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card blue">
+        <div class="stat-icon"><i class="bi bi-building"></i></div>
+        <div class="stat-value">{{ occupancy_rate }}%</div>
+        <div class="stat-label">入住率</div>
+    </div>
+    <div class="stat-card green">
+        <div class="stat-icon"><i class="bi bi-door-open"></i></div>
+        <div class="stat-value">{{ occupied }}</div>
+        <div class="stat-label">在住房数</div>
+    </div>
+    <div class="stat-card orange">
+        <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+        <div class="stat-value">{{ available }}</div>
+        <div class="stat-label">空闲房数</div>
+    </div>
+    <div class="stat-card red">
+        <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
+        <div class="stat-value">{{ dirty|add:maintenance }}</div>
+        <div class="stat-label">需处理房数</div>
+    </div>
+    <div class="stat-card purple">
+        <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+        <div class="stat-value">{{ total_revenue|floatformat:0 }}</div>
+        <div class="stat-label">今日营收 (元)</div>
+    </div>
+    <div class="stat-card blue">
+        <div class="stat-icon"><i class="bi bi-people"></i></div>
+        <div class="stat-value">{{ total_customers }}</div>
+        <div class="stat-label">客户总数</div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="quick-actions">
+    <a href="{% url 'bookings:check_in' %}" class="btn btn-primary"><i class="bi bi-door-open"></i> 办理入住</a>
+    <a href="{% url 'bookings:check_out' %}" class="btn btn-warning"><i class="bi bi-door-closed"></i> 办理退房</a>
+    <a href="{% url 'bookings:booking_create' %}" class="btn btn-success"><i class="bi bi-plus-circle"></i> 新建订单</a>
+    <a href="{% url 'bookings:check_in_walk_in' %}" class="btn btn-outline"><i class="bi bi-person-plus"></i> 散客入住</a>
+    <a href="{% url 'rooms:room_grid' %}" class="btn btn-outline"><i class="bi bi-grid-3x3-gap-fill"></i> 查看房态</a>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <div class="card-header">
+            <span><i class="bi bi-clock-history"></i> 最近入住</span>
+            <a href="{% url 'bookings:booking_list' %}" class="btn btn-outline btn-sm">查看全部</a>
+        </div>
+        <div class="card-body" style="padding:0">
+            <table class="table">
+                <thead>
+                    <tr><th>订单号</th><th>客户</th><th>房间</th><th>入住时间</th></tr>
+                </thead>
+                <tbody>
+                    {% for ci in recent_checkins %}
+                    <tr>
+                        <td><strong>{{ ci.booking.order_no }}</strong></td>
+                        <td>{{ ci.customer.name }}</td>
+                        <td>{{ ci.room.room_number|default:"-" }}</td>
+                        <td>{{ ci.check_in_time|date:"m-d H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" style="text-align:center;color:var(--text-light);padding:20px">暂无记录</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span><i class="bi bi-calendar-check"></i> 最新订单</span>
+            <a href="{% url 'bookings:booking_list' %}" class="btn btn-outline btn-sm">查看全部</a>
+        </div>
+        <div class="card-body" style="padding:0">
+            <table class="table">
+                <thead>
+                    <tr><th>订单号</th><th>客户</th><th>房型</th><th>状态</th></tr>
+                </thead>
+                <tbody>
+                    {% for b in recent_bookings %}
+                    <tr>
+                        <td><strong>{{ b.order_no }}</strong></td>
+                        <td>{{ b.customer.name }}</td>
+                        <td>{{ b.room_type_name }}</td>
+                        <td><span class="badge {% if b.status == 'checked_in' %}badge-info{% elif b.status == 'pending' %}badge-warning{% elif b.status == 'confirmed' %}badge-success{% elif b.status == 'cancelled' %}badge-danger{% else %}badge-gray{% endif %}">{{ b.get_status_display }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" style="text-align:center;color:var(--text-light);padding:20px">暂无订单</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Room Status Overview -->
+<div class="card" style="margin-top:20px">
+    <div class="card-header">
+        <span><i class="bi bi-grid-3x3-gap-fill"></i> 房态概览</span>
+    </div>
+    <div class="card-body">
+        <div style="display:flex;gap:24px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:20px;height:20px;border-radius:4px;background:#6ee7b7;"></div>
+                <span>空闲 {{ available }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:20px;height:20px;border-radius:4px;background:#93c5fd;"></div>
+                <span>住人 {{ occupied }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:20px;height:20px;border-radius:4px;background:#fcd34d;"></div>
+                <span>预定 {{ reserved }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:20px;height:20px;border-radius:4px;background:#f9a8d4;"></div>
+                <span>脏房 {{ dirty }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:20px;height:20px;border-radius:4px;background:#d1d5db;"></div>
+                <span>维修 {{ maintenance }}</span>
+            </div>
+        </div>
+        <div style="margin-top:16px">
+            <div style="background:#e5e7eb;border-radius:8px;height:8px;overflow:hidden;display:flex;">
+                {% if total_rooms > 0 %}
+                <div style="background:#6ee7b7;height:100%;width:{% widthratio available total_rooms 100 %}%"></div>
+                <div style="background:#93c5fd;height:100%;width:{% widthratio occupied total_rooms 100 %}%"></div>
+                <div style="background:#fcd34d;height:100%;width:{% widthratio reserved total_rooms 100 %}%"></div>
+                <div style="background:#f9a8d4;height:100%;width:{% widthratio dirty total_rooms 100 %}%"></div>
+                <div style="background:#d1d5db;height:100%;width:{% widthratio maintenance total_rooms 100 %}%"></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

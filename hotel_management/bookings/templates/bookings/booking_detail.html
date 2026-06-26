@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}订单详情{% endblock %}
+{% block content %}
+<div class="page-header"><h1>订单详情 - {{ booking.order_no }}</h1>
+<a href="{% url 'bookings:booking_list' %}" class="btn btn-outline">返回</a></div>
+<div class="grid-2">
+<div class="card"><div class="card-header">订单信息</div><div class="card-body">
+<div class="form-row">
+<div><label class="form-label">订单号</label><p><strong>{{ booking.order_no }}</strong></p></div>
+<div><label class="form-label">状态</label><p><span class="badge {% if booking.status == 'checked_in' %}badge-info{% elif booking.status == 'confirmed' %}badge-success{% elif booking.status == 'pending' %}badge-warning{% elif booking.status == 'cancelled' %}badge-danger{% else %}badge-gray{% endif %}">{{ booking.get_status_display }}</span></p></div>
+<div><label class="form-label">客户</label><p>{{ booking.customer.name }}</p></div>
+<div><label class="form-label">电话</label><p>{{ booking.customer.phone }}</p></div>
+<div><label class="form-label">房间</label><p>{{ booking.room.room_number|default:booking.room_type_name }}</p></div>
+<div><label class="form-label">入住日期</label><p>{{ booking.check_in_date }}</p></div>
+<div><label class="form-label">离店日期</label><p>{{ booking.check_out_date }}</p></div>
+<div><label class="form-label">金额</label><p><strong>¥{{ booking.total_amount }}</strong></p></div>
+<div><label class="form-label">押金</label><p>¥{{ booking.deposit }}</p></div>
+<div><label class="form-label">渠道</label><p>{{ booking.get_channel_display }}</p></div>
+<div><label class="form-label">创建时间</label><p>{{ booking.created_at|date:"Y-m-d H:i" }}</p></div>
+</div></div></div>
+<div class="card"><div class="card-header">入住/退房记录</div><div class="card-body">
+{% if check_in %}
+<p><strong>入住时间:</strong> {{ check_in.check_in_time|date:"Y-m-d H:i" }}</p>
+<p><strong>房卡号:</strong> {{ check_in.key_card_no|default:"-" }}</p>
+<p><strong>押金:</strong> ¥{{ check_in.deposit_amount }}</p>
+<p><strong>办理人:</strong> {{ check_in.staff.username|default:"-" }}</p>
+{% else %}<p style="color:var(--text-light)">尚未入住</p>{% endif %}
+{% if check_out %}
+<hr>
+<p><strong>退房时间:</strong> {{ check_out.check_out_time|date:"Y-m-d H:i" }}</p>
+<p><strong>房费:</strong> ¥{{ check_out.room_charge }}</p>
+<p><strong>其他消费:</strong> ¥{{ check_out.extra_charges }}</p>
+<p><strong>实收:</strong> <strong style="color:var(--danger)">¥{{ check_out.final_amount }}</strong></p>
+<p><strong>支付方式:</strong> {{ check_out.get_payment_method_display }}</p>
+{% endif %}
+</div></div>
+</div>
+{% endblock %}

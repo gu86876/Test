@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}办理退房{% endblock %}
+{% block content %}
+<div class="page-header"><h1><i class="bi bi-door-closed"></i> 办理退房</h1></div>
+{% if active_checkins %}
+<div class="card"><div class="card-body" style="padding:0">
+<table class="table">
+<thead><tr><th>订单号</th><th>客户</th><th>房间</th><th>入住时间</th><th>押金</th><th>操作</th></tr></thead>
+<tbody>
+{% for ci in active_checkins %}
+<tr>
+    <td><strong>{{ ci.booking.order_no }}</strong></td>
+    <td>{{ ci.customer.name }}</td>
+    <td>{{ ci.room.room_number|default:"-" }}</td>
+    <td>{{ ci.check_in_time|date:"m-d H:i" }}</td>
+    <td>¥{{ ci.deposit_amount }}</td>
+    <td>
+        <button class="btn btn-warning btn-sm" onclick="openCheckout('{{ ci.pk }}', '{{ ci.customer.name }}', '{{ ci.room.room_number }}', '{{ ci.deposit_amount }}', '{{ ci.booking.order_no }}')">
+            办理退房
+        </button>
+    </td>
+</tr>
+{% endfor %}
+</tbody></table></div></div>
+
+<div id="checkoutModal" class="modal-overlay" style="display:none">
+<div class="modal-content">
+<h3 style="margin-bottom:16px">退房结算</h3>
+<p style="margin-bottom:16px;color:var(--text-light)">订单: <strong id="co_order">-</strong> | 客户: <strong id="co_customer">-</strong> | 房间: <strong id="co_room">-</strong></p>
+<form method="post">{% csrf_token %}
+<input type="hidden" name="check_in_id" id="co_id">
+<input type="hidden" name="room_charge" id="co_room_charge" value="0">
+<div class="form-row">
+<div class="form-group"><label class="form-label">其他消费</label>
+<input type="number" name="extra_charges" class="form-control" step="0.01" value="0" onchange="calcTotal()"></div>
+<div class="form-group"><label class="form-label">违约金</label>
+<input type="number" name="penalty" class="form-control" step="0.01" value="0" onchange="calcTotal()"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">抵扣押金</label>
+<input type="number" name="deposit_used" class="form-control" step="0.01" value="0" id="co_deposit" onchange="calcTotal()"></div>
+<div class="form-group"><label class="form-label">支付方式</label>
+<select name="payment_method" class="form-control">
+    <option value="cash">现金</option><option value="wechat">微信支付</option>
+    <option value="alipay">支付宝</option><option value="card">刷卡</option>
+    <option value="credit">挂账</option><option value="mixed">混合支付</option>
+</select></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label class="form-label">发票号</label><input type="text" name="invoice_no" class="form-control"></div>
+<div class="form-group"><label class="form-label">备注</label><input type="text" name="notes" class="form-control"></div>
+</div>
+<div style="text-align:center;margin:16px 0;font-size:18px;font-weight:700">
+    实收: <span style="color:var(--danger)" id="co_final">0.00</span> 元
+</div>
+<div style="display:flex;gap:12px">
+    <button type="submit" class="btn btn-primary" style="flex:1">确认退房</button>
+    <button type="button" class="btn btn-outline" onclick="document.getElementById('checkoutModal').style.display='none'">取消</button>
+</div>
+</form></div></div>
+
+<script>
+function openCheckout(id, customer, room, deposit, order) {
+    document.getElementById('co_id').value = id;
+    document.getElementById('co_customer').textContent = customer;
+    document.getElementById('co_room').textContent = room;
+    document.getElementById('co_order').textContent = order;
+    document.getElementById('co_deposit').value = deposit;
+    document.getElementById('co_deposit').max = deposit;
+    document.getElementById('checkoutModal').style.display = 'flex';
+    calcTotal();
+}
+function calcTotal() {
+    var extra = parseFloat(document.querySelector('[name=extra_charges]').value)||0;
+    var penalty = parseFloat(document.querySelector('[name=penalty]').value)||0;
+    var deposit = parseFloat(document.getElementById('co_deposit').value)||0;
+    var total = extra + penalty;
+    var final = Math.max(total - deposit, 0);
+    document.getElementById('co_final').textContent = final.toFixed(2);
+}
+</script>
+{% else %}
+<div class="card"><div class="card-body"><div style="text-align:center;padding:40px;color:var(--text-light)">
+    <i class="bi bi-check-circle" style="font-size:48px;display:block;margin-bottom:12px;color:var(--success)"></i>
+    当前没有需要退房的记录
+</div></div></div>
+{% endif %}
+{% endblock %}

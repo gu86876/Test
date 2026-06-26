@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}订单管理{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-calendar-check"></i> 订单管理</h1>
+    <a href="{% url 'bookings:booking_create' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> 新建订单</a>
+</div>
+<div class="filter-bar">
+    <a href="?" class="btn btn-outline btn-sm {% if not status_filter %}active{% endif %}" style="{% if not status_filter %}background:var(--primary);color:#fff{% endif %}">全部</a>
+    {% for s in status_choices %}
+    <a href="?status={{ s.0 }}" class="btn btn-outline btn-sm {% if status_filter == s.0 %}active{% endif %}" style="{% if status_filter == s.0 %}background:var(--primary);color:#fff{% endif %}">{{ s.1 }}</a>
+    {% endfor %}
+</div>
+<div class="card"><div class="card-body" style="padding:0">
+<table class="table">
+<thead><tr><th>订单号</th><th>客户</th><th>房间</th><th>房型</th><th>入住</th><th>离店</th><th>金额</th><th>状态</th><th>渠道</th><th>操作</th></tr></thead>
+<tbody>
+{% for b in bookings %}
+<tr>
+    <td><strong>{{ b.order_no }}</strong></td>
+    <td>{{ b.customer.name }}</td>
+    <td>{{ b.room.room_number|default:"-" }}</td>
+    <td>{{ b.room_type_name }}</td>
+    <td>{{ b.check_in_date|date:"m-d" }}</td>
+    <td>{{ b.check_out_date|date:"m-d" }}</td>
+    <td>¥{{ b.total_amount }}</td>
+    <td><span class="badge {% if b.status == 'checked_in' %}badge-info{% elif b.status == 'confirmed' %}badge-success{% elif b.status == 'pending' %}badge-warning{% elif b.status == 'checked_out' %}badge-gray{% elif b.status == 'cancelled' %}badge-danger{% else %}badge-gray{% endif %}">{{ b.get_status_display }}</span></td>
+    <td>{{ b.get_channel_display }}</td>
+    <td>
+        <a href="{% url 'bookings:booking_detail' b.pk %}" class="btn btn-outline btn-xs">详情</a>
+        {% if b.status == 'pending' or b.status == 'confirmed' %}
+        <a href="{% url 'bookings:booking_cancel' b.pk %}" class="btn btn-danger btn-xs" onclick="return confirm('确认取消?')">取消</a>
+        {% endif %}
+    </td>
+</tr>
+{% empty %}
+<tr><td colspan="10" style="text-align:center;color:var(--text-light);padding:30px">暂无订单</td></tr>
+{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}收益分析{% endblock %}
+{% block content %}
+<div class="page-header"><h1><i class="bi bi-pie-chart"></i> 收益分析</h1></div>
+<div class="card"><div class="card-header">近30天营收趋势</div><div class="card-body">
+<div class="chart-bar">
+{% for item in daily_revenue %}
+<div class="bar" style="height:{% if item.revenue > 0 %}calc({{ item.revenue }}px / 500){% else %}4px{% endif %}" title="{{ item.date }}: ¥{{ item.revenue }}">
+    <div class="bar-label">{{ item.date }}</div>
+</div>
+{% endfor %}
+</div>
+<div style="margin-top:24px;text-align:center;font-size:13px;color:var(--text-light)">近30天每日营收（hover查看详情）</div>
+</div></div>
+
+<div class="card" style="margin-top:16px"><div class="card-header">消费TOP客户</div><div class="card-body" style="padding:0">
+<table class="table">
+<thead><tr><th>排名</th><th>客户</th><th>手机号</th><th>会员</th><th>累计消费</th><th>入住次数</th></tr></thead>
+<tbody>
+{% for c in top_customers %}
+<tr>
+    <td>{{ forloop.counter }}</td>
+    <td><strong>{{ c.name }}</strong></td><td>{{ c.phone }}</td>
+    <td>{{ c.membership.name|default:"普通" }}</td>
+    <td><strong style="color:var(--danger)">¥{{ c.total_spent|default:0 }}</strong></td>
+    <td>{{ c.total_stays }}</td>
+</tr>
+{% empty %}
+<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-light)">暂无数据</td></tr>
+{% endfor %}
+</tbody></table></div></div>
+{% endblock %}
