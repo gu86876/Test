@@ -13,4 +13,5 @@ urlpatterns = [
     path('customers/', include('customers.urls')),
     path('reports/', include('reports.urls')),
     path('system/', include('system_config.urls')),
+    path('portal/', include('customers.portal_urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
