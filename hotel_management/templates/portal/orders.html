@@ -1,0 +1,27 @@
+{% extends "portal/base.html" %}
+{% block title %}我的订单{% endblock %}
+{% block content %}
+<div class="section-title"><i class="bi bi-list-check"></i> 我的订单</div>
+{% for b in orders %}
+<div class="order-card">
+    <div class="order-info">
+        <div class="order-no">#{{ b.order_no }}</div>
+        <div class="order-meta">{{ b.check_in_date }} ~ {{ b.check_out_date }} · {{ b.room_type_name }} · {{ b.get_channel_display }}</div>
+        <div style="margin-top:4px">
+            <span class="badge {% if b.status == 'checked_in' %}badge-info{% elif b.status == 'confirmed' or b.status == 'checked_out' %}badge-success{% elif b.status == 'pending' %}badge-warning{% elif b.status == 'cancelled' %}badge-danger{% else %}badge-gray{% endif %}">{{ b.get_status_display }}</span>
+        </div>
+    </div>
+    <div class="order-amount">
+        <div class="price">¥{{ b.total_amount }}</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+            <a href="{% url 'portal:order_detail' b.pk %}" class="btn btn-outline btn-sm">详情</a>
+            {% if b.status == 'pending' or b.status == 'confirmed' %}
+            <a href="{% url 'portal:cancel' b.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('确认取消?')">取消</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% empty %}
+<div style="text-align:center;padding:60px;color:#9ca3af"><i class="bi bi-inbox" style="font-size:64px;display:block;margin-bottom:16px"></i>暂无订单<br><a href="{% url 'portal:rooms' %}" class="btn btn-primary btn-sm" style="margin-top:12px">去预订</a></div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "portal/base.html" %}
+{% block title %}预订 - {{ room.room_number }}{% endblock %}
+{% block content %}
+<div class="section-title"><i class="bi bi-calendar-plus"></i> 预订房间</div>
+<div style="max-width:600px;margin:0 auto">
+<div class="card" style="overflow:hidden"><div class="card-body">
+<div style="text-align:center;margin-bottom:20px">
+    <div style="font-size:48px;color:var(--gold);margin-bottom:8px"><i class="bi bi-door-open"></i></div>
+    <h2 style="margin-bottom:4px">{{ room.room_number }}</h2>
+    <div style="color:#64748b">{{ room.room_type.name }} · {{ room.floor }}楼 · {{ room.room_type.bed_type }} · {{ room.room_type.area }}</div>
+    <div style="margin-top:8px;font-size:28px;font-weight:700;color:#dc2626">¥{{ room.current_price }}<span style="font-size:14px;color:#64748b;font-weight:400">/晚</span></div>
+    {% if room.room_type.amenities %}<div style="font-size:13px;color:#9ca3af;margin-top:8px">{{ room.room_type.amenities }}</div>{% endif %}
+</div>
+<hr style="border-color:#e5e7eb">
+<form method="post">{% csrf_token %}
+    <div class="form-row">
+        <div class="form-group"><label class="form-label"><i class="bi bi-calendar-check"></i> 入住日期</label><input type="date" name="check_in" class="form-control" required min="{{ today }}"></div>
+        <div class="form-group"><label class="form-label"><i class="bi bi-calendar-x"></i> 离店日期</label><input type="date" name="check_out" class="form-control" required min="{{ today }}"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label class="form-label"><i class="bi bi-people"></i> 入住人数</label><input type="number" name="guests" class="form-control" value="1" min="1" max="{{ room.room_type.capacity }}"></div>
+    </div>
+    <div class="form-group"><label class="form-label"><i class="bi bi-pencil"></i> 备注</label><textarea name="notes" class="form-control" rows="2" placeholder="如有特殊需求请注明"></textarea></div>
+    <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:16px;margin-top:8px"><i class="bi bi-check-circle"></i> 确认预订</button>
+</form></div></div>
+</div>
+{% endblock %}

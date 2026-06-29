@@ -1,0 +1,13 @@
+﻿[build]
+  builder = "nixpacks"
+  [build.config]
+    pythonVersion = "3.14"
+
+[deploy]
+  numReplicas = 1
+  startCommand = "gunicorn hotel_management.wsgi --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120"
+  healthcheckPath = "/accounts/login/"
+  restartPolicyType = "on-failure"
+
+  [deploy.preDeploy]
+    command = "python manage.py migrate --noinput && python manage.py collectstatic --noinput"

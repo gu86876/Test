@@ -1,0 +1,15 @@
+{% extends "portal/base.html" %}
+{% block title %}登录 - 云璟国际酒店{% endblock %}
+{% block content %}
+<div class="login-card">
+    <h2><i class="bi bi-person-check"></i> 会员登录</h2>
+    <form method="post">{% csrf_token %}
+        <div class="form-group"><label class="form-label">手机号</label><input type="text" name="phone" class="form-control" placeholder="请输入手机号" required></div>
+        <div class="form-group"><label class="form-label">密码</label><input type="password" name="password" class="form-control" placeholder="请输入密码" required></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;padding:12px;font-size:15px;margin-top:8px"><i class="bi bi-box-arrow-in-right"></i> 登录</button>
+    </form>
+    <div style="text-align:center;margin-top:20px;font-size:14px;color:#64748b">
+        还没有账号？<a href="{% url 'portal:register' %}" style="color:var(--gold)">立即注册</a>
+    </div>
+</div>
+{% endblock %}

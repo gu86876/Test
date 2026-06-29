@@ -1,0 +1,28 @@
+{% extends "portal/base.html" %}
+{% block title %}云璟国际酒店 - 在线预订{% endblock %}
+{% block content %}
+<div class="hero">
+    <h1><i class="bi bi-building"></i> 云璟国际酒店</h1>
+    <p>舒适住宿 · 贴心服务 · 在线预订 · 轻松入住</p>
+    <div style="display:flex;gap:12px;justify-content:center">
+        <a href="{% url 'portal:rooms' %}" class="btn btn-primary" style="padding:12px 32px;font-size:16px"><i class="bi bi-search"></i> 查看客房</a>
+        <a href="{% url 'portal:orders' %}" class="btn btn-outline" style="padding:12px 32px;font-size:16px;color:#fff;border-color:rgba(255,255,255,0.3)"><i class="bi bi-list-check"></i> 我的订单</a>
+    </div>
+</div>
+<div class="section-title"><i class="bi bi-star-fill" style="color:#f59e0b"></i> 精选房型</div>
+<div class="room-type-grid">
+    {% for rt in room_types %}
+    <div class="room-type-card" onclick="location.href='{% url 'portal:rooms' %}?type={{ rt.pk }}'">
+        <div class="card-img">
+            <i class="bi {% if '标准' in rt.name %}bi-house{% elif '豪华' in rt.name %}bi-star{% elif '行政' in rt.name or '套房' in rt.name %}bi-gem{% else %}bi-building{% endif %}"></i>
+        </div>
+        <div class="card-body">
+            <h3>{{ rt.name }}</h3>
+            <div style="font-size:13px;color:#64748b;margin:6px 0">{{ rt.bed_type }} · {{ rt.area }} · {{ rt.capacity }}人入住</div>
+            <div class="price">¥{{ rt.base_price }}<span>/晚起</span></div>
+            {% if rt.amenities %}<div style="font-size:12px;color:#9ca3af;margin-top:4px">{{ rt.amenities|truncatechars:40 }}</div>{% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

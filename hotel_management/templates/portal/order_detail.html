@@ -1,0 +1,35 @@
+{% extends "portal/base.html" %}
+{% block title %}订单详情{% endblock %}
+{% block content %}
+<div class="section-title"><i class="bi bi-receipt"></i> 订单详情</div>
+<div class="card"><div class="card-body">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+    <div><div style="font-size:18px;font-weight:700">#{{ booking.order_no }}</div>
+    <div style="color:#64748b;font-size:13px">{{ booking.created_at|date:"Y-m-d H:i" }} · {{ booking.get_channel_display }}</div></div>
+    <span class="badge {% if booking.status == 'checked_in' %}badge-info{% elif booking.status == 'confirmed' or booking.status == 'checked_out' %}badge-success{% elif booking.status == 'pending' %}badge-warning{% elif booking.status == 'cancelled' %}badge-danger{% else %}badge-gray{% endif %}" style="font-size:14px;padding:6px 16px">{{ booking.get_status_display }}</span>
+</div>
+<div class="form-row" style="margin-bottom:16px">
+    <div><label class="form-label">入住日期</label><p><strong>{{ booking.check_in_date }}</strong></p></div>
+    <div><label class="form-label">离店日期</label><p><strong>{{ booking.check_out_date }}</strong></p></div>
+    <div><label class="form-label">预订房型</label><p>{{ booking.room_type_name }}</p></div>
+    <div><label class="form-label">房间号</label><p>{{ booking.room.room_number|default:"待分配" }}</p></div>
+    <div><label class="form-label">入住人数</label><p>{{ booking.guest_count }}人</p></div>
+    <div><label class="form-label">订单金额</label><p><strong style="color:#dc2626;font-size:20px">¥{{ booking.total_amount }}</strong></p></div>
+</div>
+{% if check_in %}<hr style="border-color:#e5e7eb"><div class="form-row">
+    <div><label class="form-label">入住时间</label><p>{{ check_in.check_in_time|date:"Y-m-d H:i" }}</p></div>
+    <div><label class="form-label">入住房间</label><p>{{ check_in.room.room_number|default:"-" }}</p></div>
+    <div><label class="form-label">押金</label><p>¥{{ check_in.deposit_amount }}</p></div>
+</div>{% endif %}
+{% if check_out %}<hr style="border-color:#e5e7eb"><div class="form-row">
+    <div><label class="form-label">退房时间</label><p>{{ check_out.check_out_time|date:"Y-m-d H:i" }}</p></div>
+    <div><label class="form-label">房费</label><p>¥{{ check_out.room_charge }}</p></div>
+    <div><label class="form-label">其他消费</label><p>¥{{ check_out.extra_charges }}</p></div>
+    <div><label class="form-label">实收金额</label><p><strong>¥{{ check_out.final_amount }}</strong></p></div>
+    <div><label class="form-label">支付方式</label><p>{{ check_out.get_payment_method_display }}</p></div>
+</div>{% endif %}
+{% if booking.status == 'pending' or booking.status == 'confirmed' %}
+<div style="margin-top:20px"><a href="{% url 'portal:cancel' booking.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('确认取消?')">取消订单</a></div>
+{% endif %}
+</div></div>
+{% endblock %}
