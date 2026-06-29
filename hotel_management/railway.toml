@@ -1,7 +1,7 @@
 ﻿[build]
   builder = "nixpacks"
   [build.config]
-    pythonVersion = "3.14"
+    pythonVersion = "3.12"
 
 [deploy]
   numReplicas = 1
